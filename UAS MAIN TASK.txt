@@ -1,0 +1,55 @@
+import cv2
+import numpy as np
+# Load the image
+image = cv2.imread("IMAGE 1.jpg")
+# Resizing the image for proper analysis
+resize = cv2.resize(image, (512,512))
+gray = cv2.cvtColor(resize, cv2.COLOR_BGR2GRAY)                    # converting the image from default BGR to grayscale to ease our shape detection thing
+# Threshold the image to get binary (black and white)
+thresh = cv2.threshold(gray, 60, 255, cv2.THRESH_BINARY_INV)
+contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)     # now we are detecting the contours,the mode and method 
+for i,contour in enumerate(contours):
+    if i==0:
+       continue
+epsilon= 0.01*cv2.arcLength( contour ,True)
+approx = cv2.approxPolyDP(contour, epsilon,True)                   # used to minimise approximations so that some irregular do not get counted under propershapes
+    if len(approx) >= 10:
+        return "circle"
+    elif len(approx) == 3:
+        return "triangle"
+    elif len(approx) >= 5 and len(approx) <= 7:
+        return "star"                                             # analysing the shape of the figures based on the corners they have
+    elif len(approx) == 4:
+        return "square"
+    else:
+        return "unknown"
+
+
+def detect_casualties(image):
+            color_name = "unknown"
+        if h < 10 or h > 160:
+            color_name = "red"
+        elif 20 < h < 40:                                         # identifying colors using hue saturation
+            color_name = "yellow"
+        elif 40 < h < 80:
+            color_name = "green"
+
+
+
+
+
+
+results=[]
+person_type = {"star": "child","square": "adult","triangle": "elderly"}.get(shape, "unknown")
+condition = {"red": "severe","yellow": "mild","green": "safe"}.get(color_name, "unknown")
+
+
+type_score = {"child": 3, "elderly": 2, "adult": 1}.get(person_type, 0)
+condition_score = {"severe": 3, "mild": 2, "safe": 1}.get(condition, 0)
+results.append((condition_score, type_score))                                     # (Emergency, Person)
+
+
+
+
+
+
